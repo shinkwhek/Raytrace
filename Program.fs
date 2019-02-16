@@ -10,9 +10,9 @@ type V(x: float, y: float, z: float) =
             V(l.X + r.X, l.Y + r.Y, l.Z + r.Z)
         static member ( - )(l: V, r: V) =
             V(l.X - r.X, l.Y - r.Y, l.Z - r.Z)
-        static member ( * )(l: V, r: V) =
-            V(l.X * r.X, l.Y * r.Y, l.Z * r.Z)
-        static member ( / )(l: V, r: float) =
+        static member ( * )(l: V, r) =
+            V(l.X * r, l.Y * r, l.Z * r)
+        static member ( / )(l: V, r) =
             V(l.X / r, l.Y / r, l.Z / r)
         static member  minus(v: V) =
             V(-v.X, -v.Y, -v.Z)
@@ -35,11 +35,10 @@ type Sphere(v: V, r: float) =
         member this.P = v 
         member this.R = r
     end
-    
-type Scene =
-    struct
-        member sphere: IVector<Sphere>
-    end
+
+type Scene = {
+    spheres: Sphere list
+}
 
 [<EntryPoint>]
 let main argv =
