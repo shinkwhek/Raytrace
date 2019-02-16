@@ -2,6 +2,7 @@
 open System.IO
 
 type V(x: float, y: float, z: float) = 
+    struct
         member this.X = x
         member this.Y = y
         member this.Z = z
@@ -21,6 +22,24 @@ type V(x: float, y: float, z: float) =
             V(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X)
         static member normarize(v: V) =
             v / sqrt(V.dot(v, v))
+    end
+
+type Ray(origin: V, direction: V) =
+    struct
+        member this.O = origin 
+        member this.D = direction
+    end
+
+type Sphere(v: V, r: float) =
+    struct
+        member this.P = v 
+        member this.R = r
+    end
+    
+type Scene =
+    struct
+        member sphere: IVector<Sphere>
+    end
 
 [<EntryPoint>]
 let main argv =
@@ -32,6 +51,10 @@ let main argv =
         yield (string h)
         yield "\n255\n"
         for i in [ 0..w*h ] do
+            let x: float = (float i) % float w
+            let y: float = (float i) % float h
+            let ray = Ray(V(2.*(x/(float w))-1., 2.*(y/(float h))-1., 5.), V(0., 0., -1.))
+
             yield "255 0 255\n"
     }
     File.WriteAllLines (@"./result.ppm", body) |> ignore
