@@ -30,15 +30,31 @@ type Ray(origin: V, direction: V) =
         member this.D = direction
     end
 
-type Sphere(v: V, r: float) =
+type Sphere(v: V, r: float) = 
     struct
         member this.P = v 
         member this.R = r
     end
 
-type Scene = {
-    spheres: Sphere list
+type Hit = {
+    t: float
+    sphere: Sphere
 }
+
+type Scene(sl: Sphere list) =
+    struct
+        member this.spheres = sl
+        static member intersect(ray: Ray, tmin: float, tmax: float): Hit option =
+            let minh : Hit option = ref None
+            for i in [ 0..this.sl.length ] do
+                let h = sl.[i].intersect(ray, tmin, tmax)
+                if h != None
+                then continue
+                else minh = h
+                     tmax = !minh.t
+            end
+            minh
+    end
 
 [<EntryPoint>]
 let main argv =
