@@ -43,6 +43,6 @@ type Vec = Vec3 of float * float * float
                      z1*x2 - z2*x1,
                      x1*y2 - x2*y2)
 
-        member this.Normarize =
+        member this.Unit =
             match this with
             | v -> v / sqrt(Vec.Dot(v, v)) 

@@ -24,7 +24,7 @@ let color(r: Ray) : Vec =
     then
         Vec3(1., 0., 0.)
     else
-    let a = r.Direction.Normarize
+    let a = r.Direction.Unit
     let t = 0.5 * (a.Y + 1.)
     Vec3(1.,1.,1.)*(1.-t) + Vec3(0.5, 0.7, 1.)*t
 
