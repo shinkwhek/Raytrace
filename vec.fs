@@ -32,12 +32,12 @@ type Vec = Vec3 of float * float * float
             match this with
             | Vec3(x,y,z) -> Vec3(-x,-y,-z)
 
-        static member Dot(a, b) =
-            match a,b with 
+        static member Dot(l, r) =
+            match l,r with 
             | Vec3(x1, y1, z1), Vec3(x2, y2, z2) -> x1*x2 + y1*y2 + z1*z2
 
-        static member Cross(a, b) =
-            match a,b with
+        static member Cross(l, r) =
+            match l,r with
             | Vec3(x1, y1, z1), Vec3(x2, y2, z2) ->
                 Vec3(y1*z2 - y2*z1,
                      z1*x2 - z2*x1,
