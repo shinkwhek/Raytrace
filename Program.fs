@@ -1,76 +1,73 @@
 ﻿open System
 open System.IO
 
-type V(x: float, y: float, z: float) = 
-    struct
-        member this.X = x
-        member this.Y = y
-        member this.Z = z
-        static member ( + )(l: V, r: V) =
-            V(l.X + r.X, l.Y + r.Y, l.Z + r.Z)
-        static member ( - )(l: V, r: V) =
-            V(l.X - r.X, l.Y - r.Y, l.Z - r.Z)
-        static member ( * )(l: V, r) =
-            V(l.X * r, l.Y * r, l.Z * r)
-        static member ( / )(l: V, r) =
-            V(l.X / r, l.Y / r, l.Z / r)
-        static member  minus(v: V) =
-            V(-v.X, -v.Y, -v.Z)
-        static member dot(a: V, b: V) =
-            a.X * b.X + a.Y * b.Y + a.Z * b.Z
-        static member cross(a: V, b: V) =
-            V(a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X)
-        static member normarize(v: V) =
-            v / sqrt(V.dot(v, v))
-    end
+type Vec = Vec3 of float * float * float
+    with
+        static member ( + )(l, r) =
+            match l,r with
+            | Vec3(x1,y1,z1), Vec3(x2,y2,z2) -> Vec3(x1+x2, y1+y2, z1+z2)
 
-type Ray(origin: V, direction: V) =
-    struct
-        member this.O = origin 
-        member this.D = direction
-    end
+        static member ( - )(l, r) =
+            match l,r with
+            | Vec3(x1,y1,z1), Vec3(x2,y2,z2) -> Vec3(x1-x2, y1-y2, z1-z2)
 
-type Sphere(v: V, r: float) = 
-    struct
-        member this.P = v 
-        member this.R = r
-    end
+        static member ( * )(l, r) =
+            match l,r with
+            | Vec3(x,y,z),r -> Vec3(x*r, y*r, z*r)
 
-type Hit = {
-    t: float
-    sphere: Sphere
-}
+        static member ( / )(l, r) =
+            match l with
+            | Vec3(x,y,z) -> Vec3(x/r, y/r, z/r)
 
-type Scene(sl: Sphere list) =
-    struct
-        member this.spheres = sl
-        static member intersect(ray: Ray, tmin: float, tmax: float): Hit option =
-            let minh : Hit option = ref None
-            for i in [ 0..this.sl.length ] do
-                let h = sl.[i].intersect(ray, tmin, tmax)
-                if h != None
-                then continue
-                else minh = h
-                     tmax = !minh.t
-            end
-            minh
-    end
+        member this.Minus =
+            match this with
+            | Vec3(x,y,z) -> Vec3(-x,-y,-z)
+
+        static member Dot(a, b) =
+            match a,b with 
+            | Vec3(x1, y1, z1), Vec3(x2, y2, z2) -> x1*x2 + y1*y2 + z1*z2
+
+        static member Cross(a, b) =
+            match a,b with
+            | Vec3(x1, y1, z1), Vec3(x2, y2, z2) ->
+                Vec3(y1*z2 - y2*z1,
+                     z1*x2 - z2*x1,
+                     x1*y2 - x2*y2)
+
+        member this.Normarize =
+            match this with
+            | v -> v / sqrt(Vec.Dot(v, v)) 
+
+type Ray = Ray3 of Vec * Vec
+    with
+        member this.Origin =
+            match this with
+            | Ray3(a,_) -> a
+
+        member this.Direction =
+            match this with
+            | Ray3(_,b) -> b
+
+        member this.Point(t) =
+            match this with
+            | Ray3(a,b) -> a + b*t
 
 [<EntryPoint>]
 let main argv =
-    let w = 1200
-    let h = 800
+    let w = 200
+    let h = 100
     let body = seq {
         yield "P3\n"
-        yield (string w)
-        yield (string h)
+        yield (string w) + " " + (string h)
         yield "\n255\n"
-        for i in [ 0..w*h ] do
-            let x: float = (float i) % float w
-            let y: float = (float i) % float h
-            let ray = Ray(V(2.*(x/(float w))-1., 2.*(y/(float h))-1., 5.), V(0., 0., -1.))
-
-            yield "255 0 255\n"
+        for k in [ 0..h ] do
+            for i in [0..w] do
+                let col = V((float i) % float w, (float (h-k)) % float h, 0.2)
+                let ir = 255.99 * col.X
+                let ig = 255.99 * col.Y
+                let ib = 255.99 * col.Z
+            
+                yield (string ir) + " " + (string ig) + " " + (string ib) + "\n"
     }
     File.WriteAllLines (@"./result.ppm", body) |> ignore
     0 // return an integer exit code
