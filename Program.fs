@@ -17,12 +17,17 @@ type Obj = Sphere of Vec * float
                 let b = 2. * Vec.Dot(r.Direction, oc)
                 let c = Vec.Dot(oc, oc) - radius*radius
                 let discriminant = b*b - 4.*a*c
-                discriminant > 0.
+                if discriminant < 0.
+                then -1.
+                else (-b - sqrt(discriminant))/(2.*a)
 
 let color(r: Ray) : Vec =
-    if Sphere(Vec3(0., 0. ,-1.), 0.5).Hit(r)
+    let sphereCenter = Vec3(0., 0., -1.)
+    let t = Sphere(sphereCenter, 0.5).Hit(r)
+    if t > 0.
     then
-        Vec3(1., 0., 0.)
+        let N = (r.Point(t) - sphereCenter).Unit
+        Vec3(N.X+1., N.Y+1., N.Z+1.) * 0.5
     else
     let a = r.Direction.Unit
     let t = 0.5 * (a.Y + 1.)
