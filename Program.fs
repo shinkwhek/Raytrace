@@ -24,9 +24,9 @@ let main argv =
 
         for k in List.rev [0..h] do
         for i in [0..w] do
-            let u = (float i) / float w
-            let v = (float k) / float h
-            let r = Ray3(origin, lowerLeftCorner + horizontal*u + vertical*v)
+            let u = horizontal * (float i)/float w
+            let v =vertical * (float k)/float h
+            let r = Ray3(origin, lowerLeftCorner + u + v)
             let col = color(r)
             let ir = int(255.99 * col.X)
             let ig = int(255.99 * col.Y)
