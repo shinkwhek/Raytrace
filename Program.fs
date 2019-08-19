@@ -3,6 +3,16 @@ open System.IO
 
 type Vec = Vec3 of float * float * float
     with
+        member this.X =
+            match this with
+            | Vec3(x,_,_) -> x
+        member this.Y =
+            match this with
+            | Vec3(_,y,_) -> y
+        member this.Z =
+            match this with
+            | Vec3(_,_,z) -> z
+
         static member ( + )(l, r) =
             match l,r with
             | Vec3(x1,y1,z1), Vec3(x2,y2,z2) -> Vec3(x1+x2, y1+y2, z1+z2)
@@ -62,7 +72,7 @@ let main argv =
         yield "\n255\n"
         for k in [ 0..h ] do
             for i in [0..w] do
-                let col = V((float i) % float w, (float (h-k)) % float h, 0.2)
+                let col = Vec3((float i) % float w, (float (h-k)) % float h, 0.2)
                 let ir = 255.99 * col.X
                 let ig = 255.99 * col.Y
                 let ib = 255.99 * col.Z
