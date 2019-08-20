@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="vec.fs" />
-    <Compile Include="ray.fs" />
-    <Compile Include="object.fs" />
-    <Compile Include="camera.fs" />
-    <Compile Include="color.fs" />
-    <Compile Include="Program.fs" />
+    <Compile Include="src/vec.fs" />
+    <Compile Include="src/ray.fs" />
+    <Compile Include="src/object.fs" />
+    <Compile Include="src/camera.fs" />
+    <Compile Include="src/color.fs" />
+    <Compile Include="src/Program.fs" />
   </ItemGroup>
 
 </Project>
