@@ -8,12 +8,11 @@ let TMax = System.Double.MaxValue
 [<Literal>]
 let TMin = 0.
 
-type HitRecord(t: float, v: Vec, n: Vec) =
-  struct
-    member this.T = t
-    member this.P = v
-    member this.N = n
-  end
+[<Struct>]
+type HitRecord =
+  { T : float
+    P : Vec
+    N : Vec}
 
 type Material = Lambertian of Vec | Metal of Vec * float | Dielectric of float
   with
@@ -103,13 +102,13 @@ type Obj = Sphere of Vec * float * Material
                   if (tMin < t) && (t < tMax)
                   then
                     let p = r.Point(t)
-                    Some(HitRecord(t, p, (p-center)/radius))
+                    Some {T=t; P=p; N=(p-center)/radius}
                   else
                     let t = (-b + sqrt(discriminant))/(2.*a)
                     if (tMin < t) && (t < tMax)
                     then
                       let p = r.Point(t)
-                      Some(HitRecord(t, p, (p-center)/radius))
+                      Some {T=t; P=p; N=(p-center)/radius}
                     else None
 
 type ObjList = World of Obj list
