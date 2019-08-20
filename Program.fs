@@ -4,12 +4,15 @@ open Vec
 open Ray
 open Object
 
-let color(r: Ray) : Vec =
-    let sphereCenter = Vec3(0., 0., -1.)
-    match Sphere(sphereCenter, 0.5).Hit(r) with
-    | Some t ->
-        let N = (r.Point(t) - sphereCenter).Unit
-        Vec3(N.X+1., N.Y+1., N.Z+1.) * 0.5
+[<Literal>]
+let TMax = System.Double.MaxValue
+[<Literal>]
+let TMin = 0.
+
+let color(r: Ray, w: ObjList) =
+    match w.Hit(r, TMax, 0.) with
+    | Some h ->
+        Vec3(h.N.X+1., h.N.Y+1., h.N.Z+1.) * 0.5
     | None ->
         let a = r.Direction.Unit
         let t = 0.5 * (a.Y + 1.)
@@ -30,12 +33,17 @@ let main argv =
         let vertical = Vec3(0., 2., 0.)
         let origin = Vec3(0., 0., 0.)
 
+        let s1 = Sphere(Vec3(0., 0., -1.), 0.5)
+        let s2 = Sphere(Vec3(0., -100.5, -1.), 100.)
+        let world = World [s1; s2]
+
         for k in List.rev [0..h-1] do
         for i in [0..w-1] do
             let u = horizontal * ((float i)/float w)
             let v =vertical * ((float k)/float h)
             let r = Ray3(origin, lowerLeftCorner + u + v)
-            let col = color(r)
+ 
+            let col = color(r, world)
             let ir = int(255.99 * col.X)
             let ig = int(255.99 * col.Y)
             let ib = int(255.99 * col.Z)
