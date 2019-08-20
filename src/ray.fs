@@ -1,16 +1,13 @@
 module Ray
 open Vec
 
-type Ray = Ray3 of Vec * Vec
+[<Struct>]
+type Ray =
+    { Origin : Vec
+      Direction : Vec }
     with
-        member this.Origin =
-            match this with
-            | Ray3(a,_) -> a
-
-        member this.Direction =
-            match this with
-            | Ray3(_,b) -> b
-
+        static member New(o: Vec, d: Vec) = 
+            { Origin = o; Direction =d }
         member this.Point(t) =
             match this with
-            | Ray3(a,b) -> a + b*t
+            | {Origin=a; Direction=b} -> a + b*t

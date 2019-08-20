@@ -12,14 +12,14 @@ let TMin = 0.
 type HitRecord =
   { T : float
     P : Vec
-    N : Vec}
+    N : Vec }
 
 type Material = Lambertian of Vec | Metal of Vec * float | Dielectric of float
   with
     static member RandInUnitSphere() =
       let rnd = System.Random()
       let rec iter() =
-        let p = Vec3(rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble())*2. - Vec3(1.,1.,1.)
+        let p = Vec.New(rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble())*2. - Vec.New(1.,1.,1.)
         if Vec.Dot(p,p) >= 1.
         then iter()
         else p
@@ -47,14 +47,14 @@ type Material = Lambertian of Vec | Metal of Vec * float | Dielectric of float
       match this with
       | Lambertian a ->
         let target = record.P + record.N + Material.RandInUnitSphere()
-        let scattered = Ray3(record.P, target-record.P)
+        let scattered = Ray.New(record.P, target-record.P)
         let attenuation = a
         Some ( scattered, attenuation )
 
       | Metal (a,f) ->
         let fuzz = if f < 1. then f else 1.
         let reflected = Material.ReflectMetal(r.Direction.Unit, record.N)
-        let scattered = Ray3(record.P, reflected+Material.RandInUnitSphere()*fuzz)
+        let scattered = Ray.New(record.P, reflected+Material.RandInUnitSphere()*fuzz)
         let attenuation = a
         if Vec.Dot(scattered.Direction, record.N) > 0.
         then
@@ -64,20 +64,20 @@ type Material = Lambertian of Vec | Metal of Vec * float | Dielectric of float
 
       | Dielectric refIdx ->
         let reflacted = Material.ReflectMetal(r.Direction, record.N)
-        let attenuation = Vec3(1.,1.,1.)
+        let attenuation = Vec.New(1.,1.,1.)
         let outwardNormal, niOverNt, cosine =
           if Vec.Dot(r.Direction, record.N) > 0.
           then record.N.Minus, refIdx, Vec.Dot(r.Direction,record.N)*refIdx / r.Direction.Length
           else record.N, 1./refIdx, -Vec.Dot(r.Direction,record.N)*refIdx / r.Direction.Length
         let scattered, reflectProb =
           match Material.ReflectDielectric(r.Direction, outwardNormal, niOverNt) with
-          | Some a -> Ray3(record.P, a), Material.Schlick(cosine, refIdx)
-          | None -> Ray3(record.P, reflacted), 1.
+          | Some a -> Ray.New(record.P, a), Material.Schlick(cosine, refIdx)
+          | None -> Ray.New(record.P, reflacted), 1.
         match Material.ReflectDielectric(r.Direction, outwardNormal, niOverNt) with
-        | Some a -> Some(Ray3(record.P, a), attenuation)
+        | Some a -> Some(Ray.New(record.P, a), attenuation)
         | None -> None
 
-type Obj = Sphere of Vec * float * Material
+type Object = Sphere of Vec * float * Material
     with
         member this.M =
           match this with
@@ -111,10 +111,11 @@ type Obj = Sphere of Vec * float * Material
                       Some {T=t; P=p; N=(p-center)/radius}
                     else None
 
-type ObjList = World of Obj list
+[<Struct>]
+type ObjList = { Objs : Object list }
   with
     member this.Hit(r: Ray, tMax, tMin) =
-      let rec hitIter(l: Obj list, r:Ray, tMax, tMin, record, material) =
+      let rec hitIter(l: Object list, r:Ray, tMax, tMin, record, material) =
         match l with
         | h::tl ->
           match h.Hit(r, tMax, tMin) with
@@ -126,7 +127,7 @@ type ObjList = World of Obj list
           | None -> record, material
 
       match this with
-      | World(lst) -> hitIter(lst, r, tMax, tMin, None, None)
+      | { Objs = lst } -> hitIter(lst, r, tMax, tMin, None, None)
         
         
       

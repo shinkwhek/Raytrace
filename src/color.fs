@@ -9,9 +9,9 @@ let rec color(r: Ray, w: ObjList, depth) =
     | Some h, Some m ->
       if depth < 50 then
         match m.Scatter(r, h) with
-        | Some (s, Vec3(ax,ay,az)) ->
+        | Some (s, {X=ax; Y=ay; Z=az}) ->
           match color(s, w, depth+1) with
-          | Vec3(x,y,z) -> Vec3(ax*x, ay*y, az*z)
+          | {X=x; Y=y; Z=z} -> Vec.New(ax*x, ay*y, az*z)
         | _ -> Vec.Zero
       else
         Vec.Zero
@@ -19,4 +19,4 @@ let rec color(r: Ray, w: ObjList, depth) =
     | _ ->
         let a = r.Direction.Unit
         let t = 0.5 * (a.Y + 1.)
-        Vec3(1.,1.,1.)*(1.-t) + Vec3(0.5, 0.7, 1.)*t
+        Vec.New(1.,1.,1.)*(1.-t) + Vec.New(0.5, 0.7, 1.)*t
