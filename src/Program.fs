@@ -21,7 +21,9 @@ let main argv =
 
         let s1 = Sphere(Vec3(0., 0., -1.), 0.5, Lambertian(Vec3(0.8,0.3,0.3)))
         let s2 = Sphere(Vec3(0., -100.5, -1.), 100., Lambertian(Vec3(0.8,0.8,0.)))
-        let world = World [s1; s2]
+        let s3 = Sphere(Vec3(1.,0.,-1.), 0.5, Metal(Vec3(0.8,0.6,0.2)))
+        let s4 = Sphere(Vec3(-1.,0.,-1.), 0.5, Metal(Vec3(0.8,0.8,0.8)))
+        let world = World [s1; s2; s3; s4]
 
         for k in List.rev [0..h-1] do
         for i in [0..w-1] do

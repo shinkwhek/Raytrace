@@ -15,7 +15,7 @@ type HitRecord(t: float, v: Vec, n: Vec) =
     member this.N = n
   end
 
-type Material = Lambertian of Vec
+type Material = Lambertian of Vec | Metal of Vec
   with
     static member RandInUnitSphere() =
       let rnd = System.Random()
@@ -26,6 +26,9 @@ type Material = Lambertian of Vec
         else p
       iter()
 
+    static member Reflect(v, n) =
+      v - n*Vec.Dot(v,n)*2.
+
     member this.Scatter(r: Ray, record: HitRecord) =
       match this with
       | Lambertian a ->
@@ -33,6 +36,15 @@ type Material = Lambertian of Vec
         let scattered = Ray3(record.P, target-record.P)
         let attenuation = a
         Some ( scattered, attenuation )
+      | Metal a ->
+        let reflected = Material.Reflect(r.Direction.Unit, record.N)
+        let scattered = Ray3(record.P, reflected)
+        let attenuation = a
+        if Vec.Dot(scattered.Direction, record.N) > 0.
+        then
+          Some ( scattered, attenuation )
+        else
+          None
 
 type Obj = Sphere of Vec * float * Material
     with
