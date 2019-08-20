@@ -50,8 +50,8 @@ let randomScene() =
 
 [<EntryPoint>]
 let main argv =
-  let w = 200
-  let h = 100
+  let w = 500
+  let h = 250
   let ns = 100
   let rand = System.Random()
 
@@ -63,8 +63,8 @@ let main argv =
       let world = randomScene()
       let camera =
         Camera.New
-          (Vec.New(-2., 2., 1.), Vec.New(0., 0., -1.), Vec.New(0., 1., 0.), 90.,
-           float (w) / float (h))
+          (Vec.New(-2., 1.5, 1.5), Vec.New(0., 0., -1.), Vec.New(0., 1., 0.),
+           60., float (w) / float (h))
       for k in List.rev [ 0..h - 1 ] do
         for i in [ 0..w - 1 ] do
           let col =
