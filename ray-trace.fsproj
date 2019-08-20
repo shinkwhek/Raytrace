@@ -10,6 +10,7 @@
     <Compile Include="vec.fs" />
     <Compile Include="ray.fs" />
     <Compile Include="object.fs" />
+    <Compile Include="camera.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
 

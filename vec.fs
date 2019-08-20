@@ -11,6 +11,8 @@ type Vec = Vec3 of float * float * float
         member this.Z =
             match this with
             | Vec3(_,_,z) -> z
+        
+        static member Zero = Vec3(0., 0., 0.)
 
         static member ( + )(l, r) =
             match l,r with
@@ -46,3 +48,4 @@ type Vec = Vec3 of float * float * float
         member this.Unit =
             match this with
             | v -> v / sqrt(Vec.Dot(v, v)) 
+        

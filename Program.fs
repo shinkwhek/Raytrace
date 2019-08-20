@@ -3,6 +3,7 @@ open System.IO
 open Vec
 open Ray
 open Object
+open Camera
 
 [<Literal>]
 let TMax = System.Double.MaxValue
@@ -23,15 +24,13 @@ let color(r: Ray, w: ObjList) =
 let main argv =
     let w = 200
     let h = 100
+    let ns = 100
+    let rand = System.Random ()
+
     let body = seq {
         yield "P3"
         yield (string w) + " " + (string h)
         yield "255"
-        
-        let lowerLeftCorner = Vec3(-2., -1., -1.)
-        let horizontal = Vec3(4., 0., 0.)
-        let vertical = Vec3(0., 2., 0.)
-        let origin = Vec3(0., 0., 0.)
 
         let s1 = Sphere(Vec3(0., 0., -1.), 0.5)
         let s2 = Sphere(Vec3(0., -100.5, -1.), 100.)
@@ -39,15 +38,17 @@ let main argv =
 
         for k in List.rev [0..h-1] do
         for i in [0..w-1] do
-            let u = horizontal * ((float i)/float w)
-            let v =vertical * ((float k)/float h)
-            let r = Ray3(origin, lowerLeftCorner + u + v)
- 
-            let col = color(r, world)
+            let col = seq {
+                for _ in [0..ns-1] do
+                let u = ((float i)+rand.NextDouble()) / float w
+                let v = ((float k)+rand.NextDouble()) /float h
+                let r = Camera().GetRay(u, v)
+                yield color(r, world)
+            }
+            let col = (col|>Seq.sum) / (float ns)
             let ir = int(255.99 * col.X)
             let ig = int(255.99 * col.Y)
             let ib = int(255.99 * col.Z)
-            
             yield (string ir) + " " + (string ig) + " " + (string ib)
     }
     File.WriteAllLines (@"./result.ppm", body) |> ignore
