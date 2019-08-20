@@ -19,8 +19,8 @@ let main argv =
         yield (string w) + " " + (string h)
         yield "255"
 
-        let s1 = Sphere(Vec3(0., 0., -1.), 0.5, Diffuse)
-        let s2 = Sphere(Vec3(0., -100.5, -1.), 100., Diffuse)
+        let s1 = Sphere(Vec3(0., 0., -1.), 0.5, Lambertian(Vec3(0.8,0.3,0.3)))
+        let s2 = Sphere(Vec3(0., -100.5, -1.), 100., Lambertian(Vec3(0.8,0.8,0.)))
         let world = World [s1; s2]
 
         for k in List.rev [0..h-1] do
@@ -30,7 +30,7 @@ let main argv =
                 let u = ((float i)+rand.NextDouble()) / float w
                 let v = ((float k)+rand.NextDouble()) /float h
                 let r = Camera().GetRay(u, v)
-                yield color(r, world)
+                yield color(r, world, 0)
             }
             let col = (col|>Seq.sum) / (float ns)
             let col = Vec3(sqrt(col.X), sqrt(col.Y), sqrt(col.Z))
