@@ -44,8 +44,11 @@ type Vec = Vec3 of float * float * float
                 Vec3(y1*z2 - y2*z1,
                      z1*x2 - z2*x1,
                      x1*y2 - x2*y2)
-
+        
+        member this.Length =
+            match this with
+            | v -> sqrt(Vec.Dot(v,v))
+        
         member this.Unit =
             match this with
-            | v -> v / sqrt(Vec.Dot(v, v)) 
-        
+            | v -> v / v.Length 
