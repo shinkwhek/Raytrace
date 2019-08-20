@@ -10,11 +10,13 @@ type HitRecord(t: float, v: Vec, n: Vec) =
     member this.N = n
   end
 
-type Obj = Sphere of Vec * float
+type Material = Diffuse
+
+type Obj = Sphere of Vec * float * Material
     with
         member this.Hit(r: Ray, tMax, tMin) =
             match this with
-            | Sphere(center, radius) ->
+            | Sphere(center, radius, _) ->
                 // C: Sphere center,
                 // Dot(p(t)-C,p(t)-C) = R^2
                 // Dot(A+tB-C,A+tB-C) = R^2

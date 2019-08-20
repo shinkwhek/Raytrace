@@ -4,20 +4,7 @@ open Vec
 open Ray
 open Object
 open Camera
-
-[<Literal>]
-let TMax = System.Double.MaxValue
-[<Literal>]
-let TMin = 0.
-
-let color(r: Ray, w: ObjList) =
-    match w.Hit(r, TMax, 0.) with
-    | Some h ->
-        Vec3(h.N.X+1., h.N.Y+1., h.N.Z+1.) * 0.5
-    | None ->
-        let a = r.Direction.Unit
-        let t = 0.5 * (a.Y + 1.)
-        Vec3(1.,1.,1.)*(1.-t) + Vec3(0.5, 0.7, 1.)*t
+open Color
 
 
 [<EntryPoint>]
@@ -32,8 +19,8 @@ let main argv =
         yield (string w) + " " + (string h)
         yield "255"
 
-        let s1 = Sphere(Vec3(0., 0., -1.), 0.5)
-        let s2 = Sphere(Vec3(0., -100.5, -1.), 100.)
+        let s1 = Sphere(Vec3(0., 0., -1.), 0.5, Diffuse)
+        let s2 = Sphere(Vec3(0., -100.5, -1.), 100., Diffuse)
         let world = World [s1; s2]
 
         for k in List.rev [0..h-1] do
@@ -46,6 +33,7 @@ let main argv =
                 yield color(r, world)
             }
             let col = (col|>Seq.sum) / (float ns)
+            let col = Vec3(sqrt(col.X), sqrt(col.Y), sqrt(col.Z))
             let ir = int(255.99 * col.X)
             let ig = int(255.99 * col.Y)
             let ib = int(255.99 * col.Z)
