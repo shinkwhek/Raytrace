@@ -1,6 +1,5 @@
 module Color
 
-open System
 open Vec
 open Ray
 open Object
