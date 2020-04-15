@@ -6,12 +6,12 @@ type Vec =
     Y : float
     Z : float }
 
-  static member New(x, y, z) =
+  static member inline New(x, y, z) =
     { X = x
       Y = y
       Z = z }
 
-  static member Zero = Vec.New(0., 0., 0.)
+  static member inline Zero = Vec.New(0., 0., 0.)
 
   static member (+) (l, r) =
     match l, r with
@@ -52,3 +52,6 @@ type Vec =
   member this.Unit =
     match this with
     | v -> v / v.Length
+
+  static member Iter f v =
+    Vec.New(f v.X, f v.Y, f v.Z)

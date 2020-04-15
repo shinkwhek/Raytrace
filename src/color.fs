@@ -7,7 +7,7 @@ open Object
 let rec color (r : Ray, w : ObjList, depth) =
   match w.Hit(r, TMax, 0.001) with
   | Some h, Some m ->
-    if depth < 50 then
+    if depth < 10 then
       match m.Scatter(r, h) with
       | Some(s, { X = ax; Y = ay; Z = az }) ->
         match color (s, w, depth + 1) with

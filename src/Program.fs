@@ -52,36 +52,66 @@ let randomScene() =
 let main argv =
   let w = 500
   let h = 250
-  let ns = 100
+  let ns = 50
   let rand = System.Random()
 
   let body =
-    seq {
-      yield "P3"
-      yield (string w) + " " + (string h)
-      yield "255"
-      let world = randomScene()
-      let camera =
-        Camera.New
-          (Vec.New(-2., 1.5, 1.5), Vec.New(0., 0., -1.), Vec.New(0., 1., 0.),
-           60., float (w) / float (h))
-      for k in List.rev [ 0..h - 1 ] do
-        for i in [ 0..w - 1 ] do
-          let col =
-            seq {
-              for _ in [ 0..ns - 1 ] do
-                let u = ((float i) + rand.NextDouble()) / float w
-                let v = ((float k) + rand.NextDouble()) / float h
-                let r = camera.GetRay(u, v)
-                yield color (r, world, 0)
-            }
+    printfn "init!"
+    let initial =
+      seq {
+        yield "P3"
+        yield (string w) + " " + (string h)
+        yield "255"
+      } |> Seq.toList
+    printfn "set initial!"
 
-          let col = (col |> Seq.sum) / (float ns)
-          let col = Vec.New(sqrt (col.X), sqrt (col.Y), sqrt (col.Z))
-          let ir = int (255.99 * col.X)
-          let ig = int (255.99 * col.Y)
-          let ib = int (255.99 * col.Z)
-          yield (string ir) + " " + (string ig) + " " + (string ib)
-    }
+    let world = randomScene()
+    let camera =
+      Camera.New
+        (Vec.New(-2., 1.5, 1.5), Vec.New(0., 0., -1.), Vec.New(0., 1., 0.),
+         60., float (w) / float (h))
+
+    printfn "set world, camera!"
+
+    let colorFetch (k, i) =
+      printfn "start %A %A" k i
+      async {
+        let randPathFetch n =
+          async {
+            let u = ((float i) + rand.NextDouble()) / float w
+            let v = ((float k) + rand.NextDouble()) / float h
+            let r = camera.GetRay(u, v)
+            return color (r, world, 0)
+          }
+        let col =
+          [ 0..ns-1 ]
+          |> Seq.map randPathFetch
+          |> Async.Parallel
+          |> Async.RunSynchronously
+
+        printfn "---- ---- ---- %A %A done" k i 
+
+        let col = (col |> Seq.sum) / (float ns)
+                  |> Vec.Iter sqrt
+        let ir, ig, ib = int (255.99 * col.X), int (255.99 * col.Y), int (255.99 * col.Z)
+        return (string ir) + " " + (string ig) + " " + (string ib)
+      }
+      
+    let pixel =
+      seq {
+        for k in List.rev [ 0..h - 1 ] do
+          for i in [ 0..w - 1 ] do
+            yield (k, i)
+      }
+      
+    pixel
+    |> Seq.map colorFetch
+    |> Async.Parallel
+    |> Async.RunSynchronously
+    |> Seq.toList
+    |> List.append initial
+
+  printfn "all done"
+    
   File.WriteAllLines(@"./result.ppm", body) |> ignore
   0 // return an integer exit code
